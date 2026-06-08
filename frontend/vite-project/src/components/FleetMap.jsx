@@ -47,7 +47,8 @@ function MapRecenter({ tripId }) {
   const trip = trips[tripId];
 
   useEffect(() => {
-    if (trip && trip.currentPos) {
+    // Safety check: Only move the map if lat and lng are actually numbers
+    if (trip && trip.currentPos && typeof trip.currentPos.lat === 'number' && typeof trip.currentPos.lng === 'number') {
       map.setView([trip.currentPos.lat, trip.currentPos.lng], 13, { animate: true });
     }
   }, [tripId, trip?.currentPos, map]);
@@ -60,10 +61,12 @@ const VehicleMarker = ({ trip, isSelected }) => {
   const [position, setPosition] = useState(trip.currentPos);
 
   useEffect(() => {
-    if (!trip.currentPos) return;
+    // Safety check: If currentPos is missing or invalid, don't animate
+    if (!trip.currentPos || typeof trip.currentPos.lat !== 'number' || typeof trip.currentPos.lng !== 'number') {
+      return;
+    }
 
-    // Simple linear interpolation for smooth movement
-    const startPos = { ...position };
+    const startPos = position || trip.currentPos;
     const endPos = { ...trip.currentPos };
     const duration = 1000; // Match the base simulation interval
     const startTime = performance.now();
@@ -84,6 +87,11 @@ const VehicleMarker = ({ trip, isSelected }) => {
 
     requestAnimationFrame(animate);
   }, [trip.currentPos]);
+
+  // FINAL SAFETY GATE: If position is still undefined or invalid, return nothing (prevents the crash)
+  if (!position || typeof position.lat !== 'number' || typeof position.lng !== 'number') {
+    return null;
+  }
 
   return (
     <Marker 
