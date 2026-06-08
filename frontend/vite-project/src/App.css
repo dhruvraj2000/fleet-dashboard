@@ -156,7 +156,7 @@ body {
 /* Main Layout */
 .dashboard-main {
   display: grid;
-  grid-template-columns: minmax(280px, 300px) 1fr minmax(280px, 320px);
+  grid-template-columns: minmax(280px, 300px) 1fr minmax(280px, 400px);
   gap: 1rem;
   padding: 1rem;
   min-height: calc(100vh - 70px);
